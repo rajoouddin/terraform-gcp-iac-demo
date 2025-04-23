@@ -1,0 +1,1 @@
+Screenshot 1: Project folder opened in VS Code with terminal showing scaffolded structure
