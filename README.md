@@ -1,3 +1,10 @@
+![Terraform](https://img.shields.io/badge/Terraform-1.6.6-623CE4?logo=terraform&logoColor=white)
+![GCP](https://img.shields.io/badge/GCP-CloudSQL%2FVPC-blue?logo=googlecloud&logoColor=white)
+![CI/CD](https://img.shields.io/github/actions/workflow/status/rajoouddin/terraform-gcp-iac-demo/terraform.yml?label=GitHub%20Actions)
+
+# GCP Infrastructure Automation with Terraform
+> A real-world example of automating Google Cloud infrastructure using Terraform modules and GitHub Actions, including private Cloud SQL, IAM auth, VPC setup, and CI/CD pipelines with manual approval controls.
+
 ## Project Overview
 
 This is a demo Terraform-based GCP infrastructure project designed for DevOps automation practice.  Below are some evidence to show a demo project being set up to meet the following needs;
@@ -43,7 +50,7 @@ To view enabled APIs:
 Screenshot 4: API library screen showing enabled APIs \
 ![Screenshot 4 - Enabled APIs](./screenshots/04-enabled-apis.png)
 
-**NOTE**: make sure the project id is used instead of the project name as this can cause issues running CLI commands
+> **NOTE**: make sure the project id is used instead of the project name as this can cause issues running CLI commands
 
 ### 5. Create a Terraform Service Account
 Screenshot 5: IAM page showing service account + key created \
@@ -54,7 +61,7 @@ Screenshot 6: GCS bucket shown in the GCP console \
 ![Screenshot 6 - GCS Bucket](./screenshots/06-gcs-backend-bucket.png)
 
 ### 7. Initialize Terraform
-Screenshot 7: Terminal showing successful terraform init \
+Screenshot 7: Terminal showing successful `terraform init` \
 ![Screenshot 7 - Terraform Init](./screenshots/07-terraform-init.png)
 
 ### 8. VPC Modules
@@ -87,11 +94,11 @@ This module creates a PostgreSQL Cloud SQL instance with IAM authentication enab
 Cloud SQL’s `private_network` input requires the **full self-link** to the VPC, not just the name.
 
 Incorrect:
-```hcl
+```bash
   network = module.vpc.vpc_name
 ```
 Correct:
-```hcl
+```bash
   network = module.vpc.vpc_self_link
 ```
 
@@ -140,7 +147,7 @@ To securely connect to the PostgreSQL instance using **IAM authentication**, the
 - **IAM-based user** created via Terraform using `type = "CLOUD_IAM_USER"`
 - **PostgreSQL flag** `cloudsql.iam_authentication` was enabled via Terraform
 
-```hcl
+```bash
 settings {
   tier = "db-f1-micro"
   ip_configuration {
@@ -160,7 +167,7 @@ IAM roles were granted manually via the GCP Console to allow secure access:
 - Cloud SQL Client
 - Cloud SQL Instance User
 
-**Note**: After changing the Cloud SQL settings, terraform apply was re-run to update the instance without destroying it. This ensures changes like database flags take effect safely.
+> **Note**: After changing the Cloud SQL settings, terraform apply was re-run to update the instance without destroying it. This ensures changes like database flags take effect safely.
 
 
 Screenshot 10a: SQL instance showing in GCP console \
@@ -169,21 +176,50 @@ Screenshot 10a: SQL instance showing in GCP console \
 Screenshot 10b: SQL IAM user setup visible under Users tab \
 ![Screenshot 10b - SQL IAM User](./screenshots/10b-sql-iam-user.png)
 
-Screenshot 10c: SQL settings page showing the enabled `cloudsql.iam_authentication` flag
-![Screenshot 10c - SQL IAM User](./screenshots/10c-sql-iam-user.png)
+Screenshot 10c: SQL settings page showing the enabled `cloudsql.iam_authentication` flag \
+![Screenshot 10c - SQL IAM User](./screenshots/10c-sql-database-flag.png)
 
 
-### 11. CI/CD with GitHub Actions for Terraform
-
+### 11. CI/CD with GitHub Actions
 To automate the provisioning process, a GitHub Actions pipeline was configured. This workflow runs automatically on any push to main and includes:
+- Terraform init (terraform init)
+- Terraform formatting check (terraform fmt)
+- Terraform validation (terraform validate)
+- Terraform planning (terraform plan)
+- Terraform apply (only after manual approval)
 
-- Terraform init
-- Terraform validation (to catch syntax/config issues)
-- Terraform plan
-- Terraform apply (on main branch)
+**Key Implementation Details**:
 
-Key Implementation Details:
+The workflow is defined at .github/workflows/terraform.yml
+- A GCP service account key is stored securely in GitHub Secrets as GCP_SA_KEY
+- On push to main, the workflow runs formatting, validation, planning
+- Apply is paused for manual approval using GitHub Environments
 
-- The workflow is defined in .github/workflows/terraform.yml
-- The GCP service account key is stored securely in GitHub Secrets as GCP_SA_KEY
-- On push to main, the workflow applies infrastructure changes automatically
+Screenshot 11: GitHub Actions workflow showing successful Plan, Apply and auto Approval \
+![Screenshot 11 - Successful GitHub Actions Workflow](./screenshots/11-github-actions-workflow.png)
+
+### 12. Terraform Linting Check
+The pipeline uses `terraform fmt -check -recursive` to ensure consistent Terraform code formatting.
+- If any `.tf` files are incorrectly formatted, the GitHub Actions workflow will fail at the linting step.
+- Locally you can fix formatting by running:
+
+```bash
+terraform fmt -recursive
+```
+
+Screenshot 12: GitHub Actions showing Terraform formatting check \
+![Screenshot 12 - GitHub Actions Format Check](./screenshots/12-github-format-check.png)
+
+### 13. Manual Approval for Terraform Apply
+To simulate real-world infrastructure change control, the GitHub Actions workflow requires manual approval before applying Terraform changes.
+
+**Implementation Details**:
+- Environment: production
+- Protection Rule: Required reviewer approval
+- Behavior:
+-- After Terraform plan, the workflow pauses.
+-- Reviewer (yourself, or later your client) must approve the apply through GitHub’s "Environments" interface.
+-- Once approved, Terraform apply executes.
+
+Screenshot 13: GitHub Actions workflow paused awaiting manual approval \
+![Screenshot 13 - GitHub Actions Manual Approval](./screenshots/13-github-manual-approval.png)
