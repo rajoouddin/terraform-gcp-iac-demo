@@ -1,6 +1,7 @@
 ![Terraform](https://img.shields.io/badge/Terraform-1.6.6-623CE4?logo=terraform&logoColor=white)
 ![GCP](https://img.shields.io/badge/GCP-CloudSQL%2FVPC-blue?logo=googlecloud&logoColor=white)
 ![CI/CD](https://img.shields.io/github/actions/workflow/status/rajoouddin/terraform-gcp-iac-demo/terraform.yml?label=GitHub%20Actions)
+![Terraform Format](https://img.shields.io/badge/Terraform%20Fmt-Passing-brightgreen?logo=terraform)
 
 # GCP Infrastructure Automation with Terraform
 > A real-world example of automating Google Cloud infrastructure using Terraform modules and GitHub Actions, including private Cloud SQL, IAM auth, VPC setup, and CI/CD pipelines with manual approval controls.
@@ -223,3 +224,30 @@ To simulate real-world infrastructure change control, the GitHub Actions workflo
 
 Screenshot 13: GitHub Actions workflow paused awaiting manual approval \
 ![Screenshot 13 - GitHub Actions Manual Approval](./screenshots/13-github-manual-approval.png)
+
+### 14. Usage Instructions
+If you want to use or adapt this project:
+
+1. **Fork this repository** to your own GitHub account.
+2. **Clone your forked repo** locally.
+3. Update the following:
+   - `backend.tf`: change the GCS bucket name if needed.
+   - `main.tf` and `variables.tf`: update any project-specific values (project ID, regions).
+4. **Set up your GCP Service Account**:
+   - Create a new service account in GCP with necessary permissions.
+   - Download the JSON key file.
+   - Encode it to base64 and store it in GitHub Secrets as `GCP_SA_KEY`.
+5. **Review the GitHub Actions workflow**:
+   - Ensure the environment name matches (`production`) or adjust as needed.
+   - Set up required reviewers for manual apply approval if needed.
+6. **Push changes** — the GitHub Actions pipeline will automatically validate and plan infrastructure changes!
+
+---
+
+### Future Improvements
+- Extend module library (e.g., GKE, Load Balancers, Cloud Storage modules)
+- Implement dynamic branching strategies (plan on PR, apply on merge)
+- Add testing stages with `terratest` or `checkov`
+- Automate service networking connection creation in Terraform
+
+---
