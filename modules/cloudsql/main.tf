@@ -4,8 +4,8 @@ resource "google_sql_database_instance" "default" {
   region           = var.region
 
   settings {
-    tier              = var.tier
-    edition           = "ENTERPRISE"
+    tier    = var.tier
+    edition = "ENTERPRISE"
     ip_configuration {
       ipv4_enabled    = false
       private_network = var.network

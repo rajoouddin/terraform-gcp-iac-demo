@@ -17,10 +17,10 @@ module "vpc" {
 }
 
 module "cloudsql" {
-  source         = "./modules/cloudsql"
-  instance_name  = "demo-sql"
-  region         = var.region
-  tier           = "db-f1-micro"
-  network        = module.vpc.vpc_self_link
-  iam_user       = "rajoo.uddin@pax2pay.com"
+  source        = "./modules/cloudsql"
+  instance_name = "demo-sql"
+  region        = var.region
+  tier          = "db-f1-micro"
+  network       = module.vpc.vpc_self_link
+  iam_user      = "rajoo.uddin@pax2pay.com"
 }
