@@ -20,10 +20,11 @@ jobs:
       with:
         terraform_version: 1.6.6
     
-    -  name: Authenticate to GCP
-       run: |
-         echo "${{ secrets.GCP_SA_KEY }}" > $HOME/gcp-key.json
-         echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp-key.json" >> $GITHUB_ENV
+    - name: Authenticate to GCP
+      run: |
+        echo "${{ secrets.GCP_SA_KEY }}" | base64 --decode > $HOME/gcp-key.json
+        echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp-key.json" >> $GITHUB_ENV
+      
 
     - name: Terraform Init
       run: terraform init
