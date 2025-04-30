@@ -22,5 +22,5 @@ module "cloudsql" {
   region        = var.region
   tier          = "db-f1-micro"
   network       = module.vpc.vpc_self_link
-  iam_user      = "rajoo.uddin@pax2pay.com"
+  iam_user      = "rajoo.uddin@example.com"
 }
